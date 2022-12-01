@@ -1,6 +1,6 @@
 ﻿namespace MinimalApiTutorial.Modules.Users.Commands;
 
-public class DeleteUserDto
+class DeleteUserDto
 {
     public Guid Id { get; set; }
 }

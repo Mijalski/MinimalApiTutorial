@@ -3,6 +3,8 @@ using MinimalApiTutorial.Modules.Users.Commands;
 using MinimalApiTutorial.Modules.Users.Jwts;
 using MinimalApiTutorial.Modules.Users.Passwords;
 using MinimalApiTutorial.Modules.Users.Queries;
+using MinimalApiTutorial.Shared;
+using MinimalApiTutorial.Shared.Users;
 
 namespace MinimalApiTutorial.Modules.Users;
 
@@ -14,7 +16,10 @@ static class UsersModule
             .AddTransient<LogInHandler>()
             .AddTransient<DeleteHandler>()
             .AddTransient<IUserPasswordService, UserBCryptPasswordService>()
-            .AddTransient<IJwtTokenGeneratorService, JwtTokenGeneratorService>();
+            .AddTransient<IJwtTokenGeneratorService, JwtTokenGeneratorService>()
+            .AddSingleton<IDeleteUserChannel, DeleteUserChannel>()
+            .AddHostedService<DeleteUserHostedService>()
+            .AddSingleton<IServiceScopeFactory<DeleteHandler>, ServiceScopeFactory<DeleteHandler>>();
 
     public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -63,9 +68,13 @@ static class UsersModule
 
 
         endpoints.MapDelete("/users",
-                async (HttpContext context, DeleteHandler handler) =>
+                async (HttpContext context, ICurrentUserService currentUserService, IDeleteUserChannel channel) =>
                 {
-                    await handler.HandleAsync(context.RequestAborted);
+                    var currentAccount = await currentUserService.GetCurrentUserAsync(context.RequestAborted);
+                    await channel.AddUserToDeleteAsync(new DeleteUserDto
+                    {
+                        Id = currentAccount.Id
+                    }, context.RequestAborted);
                     return Results.NoContent();
                 })
             .WithName("DeleteUser")

@@ -17,12 +17,10 @@ class DeleteHandler
         _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
     }
 
-    public async Task HandleAsync(CancellationToken cancellationToken = default)
+    public async Task HandleAsync(DeleteUserDto deleteUser, CancellationToken cancellationToken = default)
     {
-        var currentAccount = await _currentUserService.GetCurrentUserAsync(cancellationToken);
-
         var user = await _dbContext.Set<User>()
-            .SingleAsync(a => a.Name == currentAccount.Name, cancellationToken);
+            .SingleAsync(a => a.Id == deleteUser.Id, cancellationToken);
 
         _dbContext.Set<User>().Remove(user);
         await _dbContext.SaveChangesAsync(cancellationToken);

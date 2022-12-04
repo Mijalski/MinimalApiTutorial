@@ -8,11 +8,14 @@ namespace MinimalApiTutorial.Shared.Database;
 
 class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
+    private readonly ILoggerFactory _loggerFactory;
     public DbSet<User> Users => Set<User>();
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,
+        ILoggerFactory loggerFactory)
         : base(options)
     {
+        _loggerFactory = loggerFactory;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,5 +23,12 @@ class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        optionsBuilder.UseLoggerFactory(_loggerFactory);
     }
 }

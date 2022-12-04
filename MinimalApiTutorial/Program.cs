@@ -1,3 +1,4 @@
+using MinimalApiTutorial.Modules.Books;
 using MinimalApiTutorial.Modules.Users;
 using MinimalApiTutorial.Modules.Users.Jwts;
 using MinimalApiTutorial.Shared.Database;
@@ -14,6 +15,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
 
 builder.Services.AddUsersModule();
+builder.Services.AddBooksModule();
 
 var app = builder.Build();
 
@@ -29,5 +31,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapUsersEndpoints();
+app.MapBooksEndpoints();
 
 app.Run();

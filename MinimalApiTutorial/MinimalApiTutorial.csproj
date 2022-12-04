@@ -24,7 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Books\" />
+    <Folder Include="Modules\Books\Queries\" />
+    <Folder Include="Modules\Books\Commands\" />
   </ItemGroup>
 
 </Project>

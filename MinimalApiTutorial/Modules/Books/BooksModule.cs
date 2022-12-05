@@ -7,7 +7,8 @@ static class BooksModule
 {
     public static IServiceCollection AddBooksModule(this IServiceCollection services) =>
         services.AddTransient<GetAll>()
-            .AddTransient<CreateHandler>();
+            .AddTransient<CreateHandler>()
+            .AddTransient<UpdateDescriptionHandler>();
 
     public static IEndpointRouteBuilder MapBooksEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -29,6 +30,18 @@ static class BooksModule
                 return Results.NoContent();
             })
             .WithName("CreateBook")
+            .ProducesValidationProblem()
+            .Produces(StatusCodes.Status204NoContent)
+            .WithTags("Books");
+
+        endpoints.MapPut("/books/description",
+                async (HttpContext context, UpdateDescriptionDto command, UpdateDescriptionHandler handler) =>
+                {
+                    await handler.HandleAsync(command, context.RequestAborted);
+
+                    return Results.NoContent();
+                })
+            .WithName("UpdateBookDescription")
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status204NoContent)
             .WithTags("Books");

@@ -15,7 +15,9 @@ class GetAll
 
     public async Task<IEnumerable<BookDto>> HandleAsync(CancellationToken cancellationToken = default)
     {
-        var books = await _books.ToListAsync(cancellationToken);
+        var books = await _books
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
         return books.Select(x => new BookDto
         {
